@@ -6,26 +6,22 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Get API key from environment variables
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 if (!GEMINI_API_KEY) {
     console.error("GEMINI_API_KEY is not set in the .env file.");
     process.exit(1);
 }
 
-// Initialize the Google Generative AI client
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); 
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// Middleware to parse JSON bodies and serve static files
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Function to call the Gemini API with a single prompt string
 const getLLMResponse = async (promptText) => {
     try {
         const result = await model.generateContent(promptText);
-        const response = result.response;
+        const response = await result.response;
         return response.text();
     } catch (error) {
         console.error("Error calling Gemini API:", error.message);
@@ -33,10 +29,19 @@ const getLLMResponse = async (promptText) => {
     }
 };
 
-// Main API route to run the zero-shot test
 app.post('/run-test', async (req, res) => {
-    const fullPrompt = req.body.prompt;
-    const llmOutput = await getLLMResponse(fullPrompt);
+    const { instruction, exampleInput, actualInput } = req.body;
+    
+    let promptString = `${instruction}\n\n`;
+
+    // Only add the example input if it's provided
+    if (exampleInput) {
+        promptString += `Input: ${exampleInput}\n\n`;
+    }
+
+    promptString += `Input: ${actualInput}\nOutput:`;
+
+    const llmOutput = await getLLMResponse(promptString);
 
     res.json({
         llm_output: llmOutput
