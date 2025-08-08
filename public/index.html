@@ -3,25 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PromptVerifier - Simple Test</title>
+    <title>PromptVerifier - One-shot Test</title>
     <style>
         body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; line-height: 1.6; }
         .container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        textarea { width: 100%; height: 150px; margin-bottom: 10px; padding: 10px; box-sizing: border-box; }
+        textarea { width: 100%; height: 80px; margin-bottom: 10px; padding: 10px; box-sizing: border-box; }
         button { padding: 10px 15px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; }
         button:hover { background-color: #0056b3; }
         .output-section { margin-top: 20px; }
         .llm-output { border: 1px solid #eee; padding: 15px; margin-top: 10px; background-color: #f9f9f9; border-radius: 5px; }
+        .collapsible { background-color: #f1f1f1; color: #444; cursor: pointer; padding: 18px; width: 100%; text-align: left; border: none; outline: none; transition: 0.4s; margin-bottom: 10px;}
+        .active, .collapsible:hover { background-color: #ccc; }
+        .content { padding: 0 18px; max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; }
     </style>
 </head>
 <body>
-    <h1>PromptVerifier - Simple Zero-shot Test</h1>
+    <h1>PromptVerifier - One-shot Test</h1>
     <div class="container">
         <h2>Enter a Prompt</h2>
-        <label for="fullPrompt">Enter your prompt or query here:</label>
-        <textarea id="fullPrompt" placeholder="e.g., List the three largest oceans in the world."></textarea>
+        <label for="instruction">Instruction:</label>
+        <textarea id="instruction" placeholder="e.g., Translate the following sentence from English to French."></textarea>
         
-        <button onclick="runZeroShotTest()">Run Zero-shot Test</button>
+        <button class="collapsible">Add One-shot Example</button>
+        <div class="content">
+            <label for="exampleInput">Example Input:</label>
+            <textarea id="exampleInput" placeholder="e.g., The cat sat on the mat."></textarea>
+        </div>
+
+        <label for="actualInput">Actual Input:</label>
+        <textarea id="actualInput" placeholder="e.g., The dog barked at the mailman."></textarea>
+        
+        <button onclick="runOneShotTest()">Run One-shot Test</button>
     </div>
 
     <div class="output-section">
@@ -32,11 +44,23 @@
     </div>
 
     <script>
-        async function runZeroShotTest() {
-            const fullPrompt = document.getElementById('fullPrompt').value;
+        document.querySelector(".collapsible").addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } 
+        });
 
-            if (!fullPrompt) {
-                alert('Please enter a prompt.');
+        async function runOneShotTest() {
+            const instruction = document.getElementById('instruction').value;
+            const exampleInput = document.getElementById('exampleInput').value;
+            const actualInput = document.getElementById('actualInput').value;
+
+            if (!instruction || !actualInput) {
+                alert('Please provide an instruction and actual input.');
                 return;
             }
 
@@ -46,11 +70,10 @@
                 const response = await fetch('/run-test', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: fullPrompt })
+                    body: JSON.stringify({ instruction, exampleInput, actualInput })
                 });
 
                 const data = await response.json();
-
                 document.getElementById('llmOutput').innerHTML = `<p>${data.llm_output}</p>`;
 
             } catch (error) {
