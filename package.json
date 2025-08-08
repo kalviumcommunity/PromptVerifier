@@ -1,0 +1,29 @@
+{
+  "name": "promptverifier",
+  "version": "1.0.0",
+  "description": "> Automatically test, analyze, and refine AI prompts across multiple test cases — ensuring quality, clarity, and consistency in LLM responses.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalviumcommunity/PromptVerifier.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kalviumcommunity/PromptVerifier/issues"
+  },
+  "homepage": "https://github.com/kalviumcommunity/PromptVerifier#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "natural": "^8.1.0"
+  }
+}
