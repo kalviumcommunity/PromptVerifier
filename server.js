@@ -15,7 +15,7 @@ if (!GEMINI_API_KEY) {
 
 // Initialize the Google Generative AI client
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); l
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); 
 
 // Middleware to parse JSON bodies and serve static files
 app.use(express.json());
